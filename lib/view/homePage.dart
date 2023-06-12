@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:floodsafe/view/auth/profile_view.dart';
 import 'package:floodsafe/view/channel/channel_view.dart';
 import 'package:floodsafe/view/shelter_view.dart';
 import 'package:floodsafe/view/volunteer_view.dart';
 import 'package:floodsafe/viewmodel/channel_view_model.dart';
+import 'package:floodsafe/viewmodel/shelter_view_model.dart';
 import 'package:floodsafe/viewmodel/volunteer_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:floodsafe/model/user.dart';
@@ -26,12 +28,20 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages = [
-      ShelterView(),
+      ChangeNotifierProvider(
+        create: (context) => ShelterViewModel(), // ShelterViewModel을 제공합니다.
+        child: ShelterView(),
+      ),
       ChannelView(
           viewModel: ChannelViewModel(user: widget.user), user: widget.user),
       ChangeNotifierProvider(
         create: (context) => VolunteerViewModel(), // VolunteerViewModel을 제공합니다.
-        child: VolunteerView(),
+        child: Consumer<VolunteerViewModel>(
+          builder: (context, volunteerViewModel, _) {
+            return VolunteerView(// VolunteerView에 volunteers 전달
+                );
+          },
+        ),
       ),
     ];
   }

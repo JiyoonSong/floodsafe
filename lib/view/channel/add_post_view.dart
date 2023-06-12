@@ -2,8 +2,8 @@ import 'package:floodsafe/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../model/user.dart';
-import '../viewmodel/channel_view_model.dart';
+import '../../model/user.dart';
+import '../../viewmodel/channel_view_model.dart';
 
 class AddPostView extends StatefulWidget {
   final void Function(String content, PickedFile image) addPost;

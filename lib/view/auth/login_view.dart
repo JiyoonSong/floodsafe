@@ -1,11 +1,11 @@
-import 'package:floodsafe/view/admin_homepage.dart';
-import 'package:floodsafe/view/organizer_homepage.dart';
-import 'package:floodsafe/view/register_view.dart';
+import 'package:floodsafe/view/admin/admin_homepage.dart';
+import 'package:floodsafe/view/organizer/organizer_homepage.dart';
+import 'package:floodsafe/view/auth/register_view.dart';
 import 'package:flutter/material.dart';
 
-import '../model/user.dart';
-import '../viewmodel/auth_view_model.dart';
-import 'homePage.dart';
+import '../../model/user.dart';
+import '../../viewmodel/auth_view_model.dart';
+import '../homePage.dart';
 
 class LoginView extends StatefulWidget {
   @override

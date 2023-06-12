@@ -1,5 +1,5 @@
+import 'package:floodsafe/model/user.dart';
 import 'package:flutter/material.dart';
-import '../model/user.dart';
 
 class OrganizerPage extends StatelessWidget {
   final UserModel user;

@@ -1,5 +1,5 @@
 import 'package:floodsafe/model/post.dart';
-import 'package:floodsafe/view/add_post_view.dart';
+import 'package:floodsafe/view/channel/add_post_view.dart';
 import 'package:flutter/material.dart';
 import 'package:floodsafe/model/user.dart';
 import 'package:floodsafe/viewmodel/channel_view_model.dart';

@@ -1,6 +1,7 @@
+import 'package:floodsafe/viewmodel/shelter_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 
 class ShelterView extends StatefulWidget {
   @override
@@ -8,70 +9,44 @@ class ShelterView extends StatefulWidget {
 }
 
 class _ShelterViewState extends State<ShelterView> {
-  // late GoogleMapController _mapController;
-  // late LocationData _currentLocation;
-  // Location _location = Location();
+  late ShelterViewModel _viewModel;
 
   @override
-  void initState() {
-    super.initState();
-    // _getCurrentLocation();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _viewModel = Provider.of<ShelterViewModel>(context);
+    _viewModel.fetchShelters();
   }
-
-  //Future<void> _getCurrentLocation() async {
-  //   final locationData = await _location.getLocation();
-  //   setState(() {
-  //     _currentLocation = locationData;
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shelter'),
+        title: Text('Shelters'),
       ),
-      // body: Stack(
-      //   children: [
-      //     GoogleMap(
-      //       initialCameraPosition: CameraPosition(
-      //         target: LatLng(
-      //           _currentLocation.latitude ?? 37.7749,
-      //           _currentLocation.longitude ?? -122.4194,
-      //         ),
-      //         zoom: 14,
-      //       ),
-      //       onMapCreated: (controller) {
-      //         setState(() {
-      //           _mapController = controller;
-      //         });
-      //       },
-      //       myLocationEnabled: true,
-      //     ),
-      //     Align(
-      //       alignment: Alignment.bottomRight,
-      //       child: Padding(
-      //         padding: const EdgeInsets.all(16.0),
-      //         child: FloatingActionButton(
-      //           onPressed: () {
-      //             _mapController.animateCamera(
-      //               CameraUpdate.newCameraPosition(
-      //                 CameraPosition(
-      //                   target: LatLng(
-      //                     _currentLocation.latitude ?? 37.7749,
-      //                     _currentLocation.longitude ?? -122.4194,
-      //                   ),
-      //                   zoom: 14,
-      //                 ),
-      //               ),
-      //             );
-      //           },
-      //           child: Icon(Icons.my_location),
-      //         ),
-      //       ),
-      //     ),
-      //   ],
-      //),
+      body: Consumer<ShelterViewModel>(
+        builder: (context, viewModel, _) {
+          final shelters = viewModel.shelters;
+          return GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: LatLng(37.5, 127.0), // 시작 위치
+              zoom: 10.0,
+            ),
+            markers: shelters
+                .map(
+                  (shelter) => Marker(
+                    markerId: MarkerId(shelter.id),
+                    position: LatLng(shelter.latitude, shelter.longitude),
+                    infoWindow: InfoWindow(
+                      title: shelter.name,
+                      snippet: 'Updated: ${shelter.updateDate.toString()}',
+                    ),
+                  ),
+                )
+                .toSet(),
+          );
+        },
+      ),
     );
   }
 }
