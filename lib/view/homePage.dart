@@ -1,99 +1,98 @@
-import 'dart:async';
-
-import 'package:floodsafe/app_navigator.dart';
-import 'package:floodsafe/view/ChannelPage.dart';
-import 'package:floodsafe/view/ShelterPage.dart';
-import 'package:floodsafe/view/loginPage.dart';
-import 'package:floodsafe/view/signUpPage.dart';
-import 'package:floodsafe/viewmodel/UserViewModel.dart';
+import 'package:floodsafe/view/auth/profile_view.dart';
+import 'package:floodsafe/view/channel/channel_view.dart';
+import 'package:floodsafe/view/shelter_view.dart';
+import 'package:floodsafe/view/volunteer_view.dart';
+import 'package:floodsafe/viewmodel/channel_view_model.dart';
+import 'package:floodsafe/viewmodel/volunteer_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:floodsafe/model/user.dart';
 import 'package:provider/provider.dart';
 
-class homePage extends StatefulWidget {
+class HomePage extends StatefulWidget {
+  final UserModel user;
+
+  HomePage({required this.user});
+
   @override
-  _homePage createState() => _homePage();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _homePage extends State<homePage> {
-  bool _isSignedIn = false;
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 1;
+
+  List<Widget> _pages = [];
 
   @override
   void initState() {
     super.initState();
-    _all();
+    _pages = [
+      ShelterView(),
+      ChannelView(
+          viewModel: ChannelViewModel(user: widget.user), user: widget.user),
+      ChangeNotifierProvider(
+        create: (context) => VolunteerViewModel(), // VolunteerViewModel을 제공합니다.
+        child: VolunteerView(),
+      ),
+    ];
   }
 
-  void _all() async {}
+  void _onTabSelected(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
 
-  void _navigateToSignUpPage(BuildContext context) async {
-    final bool isRegistered = await AppNavigator.navigateToSignUpPage(context);
-    if (isRegistered) {
-      AppNavigator.navigateToLoginPage(context);
+    if (index != 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => _pages[index],
+        ),
+      );
     }
   }
 
-  void _navigateToLoginPage(BuildContext context) async {
-    final bool islogin = await AppNavigator.navigateToLoginPage(context);
-    if (islogin) {
-      //go to home page
-    }
-  }
-
-  void _navigateToShelterPage(BuildContext context) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ShelterPage()));
-  }
-
-  void _navigateToChannelPage(BuildContext context) async {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ChannelPage()));
-  }
-
-  Completer<GoogleMapController> _controller = Completer();
   @override
   Widget build(BuildContext context) {
+    assert(_selectedIndex >= 0 && _selectedIndex < _pages.length);
     return Scaffold(
-      appBar: AppBar(title: Text("Flood Safe"), backgroundColor: Colors.grey),
-      drawer: Drawer(
-          child: ListView(
-        children: [
-          DrawerHeader(child: Text("Menu")),
-          ListTile(title: Text("Home")),
-          ListTile(
-              title: Text("Register"),
-              onTap: () {
-                _navigateToSignUpPage(context);
-              }),
-          ListTile(
-              title: Text("Login"),
-              onTap: () {
-                _navigateToLoginPage(context);
-              }),
-          ListTile(
-              title: Text("Shelter"),
-              onTap: () async {
-                _navigateToShelterPage(context);
-              }),
-          ListTile(
-            title: Text("Channel"),
-            onTap: () {
-              _navigateToChannelPage(context);
+      appBar: AppBar(
+        title: Text('Flood Safe Mobile Application'),
+        backgroundColor: Colors.grey,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileView(user: widget.user),
+                ),
+              );
             },
           ),
-
-          // ListTile(title: Text("Logout"), onTap: () async {})
         ],
-      )),
-      body: Stack(children: <Widget>[
-        GoogleMap(
-          onMapCreated: (GoogleMapController controller) {
-            _controller.complete(controller);
-          },
-          initialCameraPosition:
-              CameraPosition(target: LatLng(1.572567, 103.619954), zoom: 15),
-        )
-      ]),
+      ),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onTabSelected,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shield),
+            label: 'Shelter',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Channel',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.group),
+            label: 'Volunteer',
+          ),
+        ],
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.black,
+      ),
     );
   }
 }

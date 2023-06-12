@@ -47,6 +47,8 @@ dependencies:
   json_serializable: ^6.6.1
   json_annotation: ^4.8.0
   geolocator: ^9.0.2
+  geocoding: ^2.1.0
+  firebase_database: ^10.2.2
 
 dev_dependencies:
   flutter_test:
