@@ -22,7 +22,13 @@ class _ShelterViewState extends State<ShelterView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shelters'),
+        title: Text(
+          'Shelters',
+          style: TextStyle(
+            color: Colors.black, // 글씨색을 검정색으로 변경
+          ),
+        ),
+        backgroundColor: Colors.white,
       ),
       body: Consumer<ShelterViewModel>(
         builder: (context, viewModel, _) {

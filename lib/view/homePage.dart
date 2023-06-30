@@ -1,4 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:floodsafe/model/volunteer.dart';
 import 'package:floodsafe/view/auth/profile_view.dart';
 import 'package:floodsafe/view/channel/channel_view.dart';
 import 'package:floodsafe/view/shelter_view.dart';
@@ -20,50 +21,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 1;
-
-  List<Widget> _pages = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _pages = [
-      ChangeNotifierProvider(
-        create: (context) => ShelterViewModel(), // ShelterViewModel을 제공합니다.
-        child: ShelterView(),
-      ),
-      ChannelView(
-          viewModel: ChannelViewModel(user: widget.user), user: widget.user),
-      ChangeNotifierProvider(
-        create: (context) => VolunteerViewModel(), // VolunteerViewModel을 제공합니다.
-        child: Consumer<VolunteerViewModel>(
-          builder: (context, volunteerViewModel, _) {
-            return VolunteerView(// VolunteerView에 volunteers 전달
-                );
-          },
-        ),
-      ),
-    ];
-  }
-
-  void _onTabSelected(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    if (index != 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => _pages[index],
-        ),
-      );
-    }
-  }
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    assert(_selectedIndex >= 0 && _selectedIndex < _pages.length);
     return Scaffold(
       appBar: AppBar(
         title: Text('Flood Safe Mobile Application'),
@@ -82,11 +43,42 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          Center(
+            child: Text('Welcome ${widget.user.name}'),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => ShelterViewModel(),
+            child: ShelterView(),
+          ),
+          ChannelView(
+            viewModel: ChannelViewModel(user: widget.user),
+            user: widget.user,
+          ),
+          ChangeNotifierProvider(
+            create: (context) => VolunteerViewModel(),
+            child: Consumer<VolunteerViewModel>(
+              builder: (context, volunteerViewModel, _) {
+                return VolunteerView();
+              },
+            ),
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onTabSelected,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
         items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shield),
             label: 'Shelter',
