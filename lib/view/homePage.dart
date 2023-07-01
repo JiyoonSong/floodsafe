@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:floodsafe/model/post.dart';
 import 'package:floodsafe/model/volunteer.dart';
 import 'package:floodsafe/view/auth/profile_view.dart';
 import 'package:floodsafe/view/channel/channel_view.dart';
 import 'package:floodsafe/view/shelter_view.dart';
-import 'package:floodsafe/view/volunteer_view.dart';
+import 'package:floodsafe/view/volunteer/volunteer_view.dart';
 import 'package:floodsafe/viewmodel/channel_view_model.dart';
 import 'package:floodsafe/viewmodel/shelter_view_model.dart';
 import 'package:floodsafe/viewmodel/volunteer_view_model.dart';
@@ -47,7 +48,7 @@ class _HomePageState extends State<HomePage> {
         index: _selectedIndex,
         children: [
           Center(
-            child: Text('Welcome ${widget.user.name}'),
+            child: Text('Welcome ${widget.user.name ?? "User"}'),
           ),
           ChangeNotifierProvider(
             create: (context) => ShelterViewModel(),

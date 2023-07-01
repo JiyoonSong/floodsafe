@@ -5,7 +5,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
-import 'package:http/http.dart' as http; // http 패키지 import
+import 'package:http/http.dart' as http;
+
+import '../homepage.dart'; // http 패키지 import
 
 class ProfileView extends StatefulWidget {
   final UserModel user;
@@ -106,6 +108,20 @@ class _ProfileViewState extends State<ProfileView> {
                 child: ElevatedButton(
                   onPressed: () {
                     _updateProfile();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomePage(
+                          user: UserModel(
+                            id: widget.user.id,
+                            email: widget.user.email,
+                            name: widget.user.name,
+                            place: widget.user.place,
+                            type: widget.user.type,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.grey, // 회색 배경색으로 변경

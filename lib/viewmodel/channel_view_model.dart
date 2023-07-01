@@ -44,7 +44,13 @@ class ChannelViewModel extends ChangeNotifier {
           .ref()
           .child('post_images')
           .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
-      final UploadTask uploadTask = storageRef.putFile(File(image.path));
+
+      final File imageFile = File(image.path);
+      if (!imageFile.existsSync()) {
+        throw Exception('Image file not found');
+      }
+
+      final UploadTask uploadTask = storageRef.putFile(imageFile);
       final TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
       final String imageUrl = await snapshot.ref.getDownloadURL();
 
@@ -59,7 +65,7 @@ class ChannelViewModel extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      // 에러 처리
+      // Handle error
       print('Error adding post: $e');
     }
   }
@@ -80,7 +86,7 @@ class ChannelViewModel extends ChangeNotifier {
           .doc(post.id)
           .update({'postStatus': 'inactive'});
     } catch (e) {
-      // 에러 처리
+      throw Exception('Error reporting post: $e');
     }
   }
 }

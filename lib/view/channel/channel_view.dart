@@ -53,19 +53,28 @@ class _ChannelViewState extends State<ChannelView> {
       userId: widget.user.id,
     );
 
-    await widget.viewModel.addPost(post, _pickedImage!);
+    final uploadTask = widget.viewModel.addPost(post, _pickedImage!);
 
-    _textController.clear();
-    setState(() {
-      _pickedImage = null;
+    uploadTask.whenComplete(() {
+      _textController.clear();
+      setState(() {
+        _pickedImage = null;
+      });
+    }).catchError((error) {
+      // 업로드 실패 시 에러 처리
+      print('Error uploading image: $error');
     });
   }
 
   Future<void> _reportPost(Post post) async {
-    await widget.viewModel.reportPost(post);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('reported successfully')),
-    );
+    try {
+      await widget.viewModel.reportPost(post);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('reported successfully')),
+      );
+    } catch (e) {
+      print('Error reporting post: $e');
+    }
   }
 
   @override
