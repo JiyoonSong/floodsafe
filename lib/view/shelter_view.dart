@@ -2,6 +2,7 @@ import 'package:floodsafe/viewmodel/shelter_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ShelterView extends StatefulWidget {
   @override
@@ -10,12 +11,26 @@ class ShelterView extends StatefulWidget {
 
 class _ShelterViewState extends State<ShelterView> {
   late ShelterViewModel _viewModel;
+  LatLng? _currentLocation; // Initialize with null value
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _viewModel = Provider.of<ShelterViewModel>(context);
     _viewModel.fetchShelters();
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentLocation = LatLng(position.latitude, position.longitude);
+      });
+    } catch (e) {
+      print('Error getting current location: $e');
+    }
   }
 
   @override
@@ -25,7 +40,7 @@ class _ShelterViewState extends State<ShelterView> {
         title: Text(
           'Shelters',
           style: TextStyle(
-            color: Colors.black, // 글씨색을 검정색으로 변경
+            color: Colors.black,
           ),
         ),
         backgroundColor: Colors.white,
@@ -35,7 +50,8 @@ class _ShelterViewState extends State<ShelterView> {
           final shelters = viewModel.shelters;
           return GoogleMap(
             initialCameraPosition: CameraPosition(
-              target: LatLng(37.5, 127.0), // 시작 위치
+              target: _currentLocation ??
+                  LatLng(1.5629284761337225, 103.63815745146225),
               zoom: 10.0,
             ),
             markers: shelters

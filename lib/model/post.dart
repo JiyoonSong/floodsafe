@@ -4,6 +4,8 @@ class Post {
   String? id;
   String content;
   String? place;
+  double? latitude;
+  double? longitude;
   String? userId;
   String imageUrl;
   DateTime date;
@@ -14,6 +16,8 @@ class Post {
     this.id,
     required this.content,
     required this.place,
+    required this.latitude,
+    required this.longitude,
     required this.userId,
     required this.imageUrl,
     required this.date,
@@ -26,6 +30,8 @@ class Post {
       id: map['id'],
       content: map['content'],
       place: map['place'],
+      latitude: map['latitude'],
+      longitude: map['longitude'],
       userId: map['userId'],
       imageUrl: map['imageUrl'],
       date: map['date'] != null
@@ -41,6 +47,8 @@ class Post {
       'id': id,
       'content': content,
       'place': place,
+      'latitude': latitude,
+      'longitude': longitude,
       'userId': userId,
       'imageUrl': imageUrl,
       'date': date,

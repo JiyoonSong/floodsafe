@@ -1,9 +1,12 @@
 import 'package:floodsafe/model/post.dart';
 import 'package:floodsafe/view/channel/add_post_view.dart';
+import 'package:floodsafe/view/postPopup.dart';
 import 'package:flutter/material.dart';
 import 'package:floodsafe/model/user.dart';
 import 'package:floodsafe/viewmodel/channel_view_model.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'dart:math' show sin, cos, sqrt, atan2;
 
 class ChannelView extends StatefulWidget {
   final ChannelViewModel viewModel;
@@ -46,10 +49,12 @@ class _ChannelViewState extends State<ChannelView> {
     final post = Post(
       content: _textController.text,
       place: widget.user.place,
-      imageUrl: '', // Initialize imageUrl
-      date: DateTime.now(), // Initialize date
-      postStatus: 'active', // Initialize postStatus
-      name: widget.user.name, // Add username
+      latitude: widget.user.latitude,
+      longitude: widget.user.longitude,
+      imageUrl: '',
+      date: DateTime.now(),
+      postStatus: 'active',
+      name: widget.user.name,
       userId: widget.user.id,
     );
 
@@ -84,6 +89,38 @@ class _ChannelViewState extends State<ChannelView> {
     } catch (e) {
       print('Error deleting post: $e');
     }
+  }
+
+  double calculateDistance(
+    double? lat1,
+    double? lon1,
+    double? lat2,
+    double? lon2,
+  ) {
+    const double earthRadius = 6371; // Radius of the earth in kilometers
+
+    // Convert degrees to radians
+    double? lat1Rad = degreesToRadians(lat1);
+    double? lon1Rad = degreesToRadians(lon1);
+    double? lat2Rad = degreesToRadians(lat2);
+    double? lon2Rad = degreesToRadians(lon2);
+
+    double? dLat = lat2Rad - lat1Rad;
+    double? dLon = lon2Rad - lon1Rad;
+
+    double? a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1Rad) * cos(lat2Rad) * sin(dLon / 2) * sin(dLon / 2);
+    double? c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    double? distance = earthRadius * c;
+
+    return distance;
+  }
+
+  double degreesToRadians(double? degrees) {
+    if (degrees == null) {
+      return 0.0; // Or any default value
+    }
+    return degrees * (3.141592653589793 / 180);
   }
 
   @override
@@ -123,7 +160,7 @@ class _ChannelViewState extends State<ChannelView> {
       body: Column(
         children: [
           SizedBox(
-            height: 8, // 원하는 간격 크기로 조정
+            height: 8,
           ),
           Expanded(
             child: StreamBuilder<List<Post>>(
@@ -134,6 +171,27 @@ class _ChannelViewState extends State<ChannelView> {
                   final activePosts = posts
                       .where((post) => post.postStatus == 'active')
                       .toList();
+                  // Sort by the latest date
+                  activePosts.sort((a, b) => b.date.compareTo(a.date));
+
+                  // Sort by the closest distance
+                  final userLatitude = widget.user.latitude;
+                  final userLongitude = widget.user.longitude;
+                  activePosts.sort((a, b) {
+                    final aDistance = calculateDistance(
+                      userLatitude,
+                      userLongitude,
+                      a.latitude,
+                      a.longitude,
+                    );
+                    final bDistance = calculateDistance(
+                      userLatitude,
+                      userLongitude,
+                      b.latitude,
+                      b.longitude,
+                    );
+                    return aDistance.compareTo(bDistance);
+                  });
                   return ListView.builder(
                     itemCount: activePosts.length,
                     itemBuilder: (context, index) {
@@ -144,8 +202,8 @@ class _ChannelViewState extends State<ChannelView> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Place: ${widget.user.place}'),
-                            // Text('Username: ${widget.user.name}'),
+                            Text('Place: ${post.place}'),
+                            Text('Username: ${post.name}'),
                           ],
                         ),
                         trailing: isMyPost
@@ -168,13 +226,29 @@ class _ChannelViewState extends State<ChannelView> {
                               ),
                         leading:
                             post.imageUrl != null && post.imageUrl.isNotEmpty
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      post.imageUrl!,
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
+                                ? GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return PostPopup(
+                                            imageUrl: post.imageUrl,
+                                            description: post.content,
+                                            place: post.place,
+                                            date: post.date,
+                                            name: post.name,
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        post.imageUrl!,
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   )
                                 : SizedBox.shrink(),

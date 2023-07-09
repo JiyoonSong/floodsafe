@@ -58,6 +58,8 @@ class ChannelViewModel extends ChangeNotifier {
       post.date = DateTime.now();
       post.name = _user.name; // Add user name
       post.place = _user.place;
+      post.latitude = _user.latitude;
+      post.longitude = _user.longitude;
 
       final DocumentReference docRef =
           await _firestore.collection('posts').add(post.toMap());

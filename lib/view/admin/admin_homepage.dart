@@ -1,3 +1,4 @@
+import 'package:floodsafe/view/postPopup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../model/user.dart';
@@ -23,7 +24,7 @@ class AdminPage extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<List<Post>> snapshot) {
           if (snapshot.hasData) {
             List<Post> inactivePosts = snapshot.data!
-                .where((post) => post.postStatus == 'inactive')
+                .where((post) => post.postStatus == 'reported')
                 .toList();
 
             return ListView.builder(
@@ -40,24 +41,33 @@ class AdminPage extends StatelessWidget {
                       Text('User: ${post.name}'),
                     ],
                   ),
-                  leading: post.imageUrl.isNotEmpty
-                      ? Image.network(
-                          post.imageUrl,
-                          width: 48,
-                          height: 48,
-                          fit: BoxFit.cover,
+                  leading: post.imageUrl != null && post.imageUrl.isNotEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return PostPopup(
+                                  imageUrl: post.imageUrl,
+                                  description: post.content,
+                                  place: post.place,
+                                  date: post.date,
+                                  name: post.name,
+                                );
+                              },
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              post.imageUrl!,
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         )
-                      : Container(
-                          width: 48,
-                          height: 48,
-                          color: Colors.grey,
-                        ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      channelViewModel.deletePost(post);
-                    },
-                  ),
+                      : SizedBox.shrink(),
                 );
               },
             );

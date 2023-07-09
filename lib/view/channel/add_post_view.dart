@@ -39,6 +39,8 @@ class _AddPostViewState extends State<AddPostView> {
           Post(
             content: content,
             place: widget.user.place,
+            latitude: widget.user.latitude,
+            longitude: widget.user.longitude,
             userId: widget.user.id,
             imageUrl: '',
             date: DateTime.now(),
