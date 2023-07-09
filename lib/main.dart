@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:floodsafe/model/user.dart';
 import 'package:floodsafe/view/auth/login_view.dart';
 import 'package:floodsafe/viewmodel/channel_view_model.dart';
 import 'package:floodsafe/viewmodel/volunteer_view_model.dart';
@@ -21,6 +22,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => VolunteerViewModel()),
+        ChangeNotifierProvider(
+            create: (_) =>
+                ChannelViewModel(user: UserModel(email: '', id: ''))),
       ],
       child: MaterialApp(
         title: 'FloodSafe',

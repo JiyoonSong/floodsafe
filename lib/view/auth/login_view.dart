@@ -16,6 +16,7 @@ class _LoginViewState extends State<LoginView> {
   final AuthViewModel _authViewModel = AuthViewModel();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoginFailed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +63,13 @@ class _LoginViewState extends State<LoginView> {
                 },
                 child: Text('Create an account'),
               ),
+              if (_isLoginFailed)
+                Text(
+                  'Invalid email or password',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
             ],
           ),
         ),
@@ -118,7 +126,7 @@ class _LoginViewState extends State<LoginView> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('Check'),
+                child: Text('OK'),
               ),
             ],
           );

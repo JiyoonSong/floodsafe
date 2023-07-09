@@ -57,11 +57,16 @@ class ChannelViewModel extends ChangeNotifier {
       post.imageUrl = imageUrl ?? '';
       post.date = DateTime.now();
       post.name = _user.name; // Add user name
-      post.place = _user.place; // Add user address
+      post.place = _user.place;
 
       final DocumentReference docRef =
           await _firestore.collection('posts').add(post.toMap());
       post.id = docRef.id; // Assign the generated ID to the post
+
+      await _firestore
+          .collection('posts')
+          .doc(post.id)
+          .update({'id': post.id}); // Update the post with the assigned ID
 
       notifyListeners();
     } catch (e) {
@@ -84,9 +89,36 @@ class ChannelViewModel extends ChangeNotifier {
       await _firestore
           .collection('posts')
           .doc(post.id)
-          .update({'postStatus': 'inactive'});
+          .update({'postStatus': 'reported'});
     } catch (e) {
       throw Exception('Error reporting post: $e');
+    }
+  }
+
+  List<Post> _inactivePosts = [];
+  List<Post> get inactivePosts => _inactivePosts;
+
+  Future<void> _getInactivePosts() async {
+    try {
+      final QuerySnapshot snapshot = await _firestore
+          .collection('posts')
+          .where('postStatus', isEqualTo: 'inactive')
+          .get();
+      _inactivePosts = snapshot.docs
+          .map((doc) => Post.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+      notifyListeners();
+    } catch (e) {
+      // 에러 처리
+    }
+  }
+
+  Future<void> _deletePost(Post post) async {
+    try {
+      await _firestore.collection('posts').doc(post.id).delete();
+      await fetchPosts();
+    } catch (e) {
+      // 에러 처리
     }
   }
 }

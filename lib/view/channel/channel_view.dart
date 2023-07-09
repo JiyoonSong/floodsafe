@@ -53,27 +53,36 @@ class _ChannelViewState extends State<ChannelView> {
       userId: widget.user.id,
     );
 
-    final uploadTask = widget.viewModel.addPost(post, _pickedImage!);
-
-    uploadTask.whenComplete(() {
-      _textController.clear();
-      setState(() {
-        _pickedImage = null;
-      });
-    }).catchError((error) {
-      // 업로드 실패 시 에러 처리
-      print('Error uploading image: $error');
+    await widget.viewModel.addPost(post, _pickedImage!);
+    _textController.clear();
+    setState(() {
+      _pickedImage = null;
     });
+
+    // Fetch posts again after adding a new post
+    await widget.viewModel.fetchPosts();
   }
 
   Future<void> _reportPost(Post post) async {
     try {
       await widget.viewModel.reportPost(post);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('reported successfully')),
+        SnackBar(content: Text('Reported successfully')),
       );
     } catch (e) {
       print('Error reporting post: $e');
+    }
+  }
+
+  Future<void> _deletePost(Post post) async {
+    try {
+      await widget.viewModel.deletePost(post);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Post deleted successfully')),
+      );
+      widget.viewModel.fetchPosts(); // Fetch posts after deleting
+    } catch (e) {
+      print('Error deleting post: $e');
     }
   }
 
@@ -129,6 +138,7 @@ class _ChannelViewState extends State<ChannelView> {
                     itemCount: activePosts.length,
                     itemBuilder: (context, index) {
                       final post = activePosts[index];
+                      final isMyPost = post.userId == widget.user.id;
                       return ListTile(
                         title: Text(post.content),
                         subtitle: Column(
@@ -138,25 +148,24 @@ class _ChannelViewState extends State<ChannelView> {
                             // Text('Username: ${widget.user.name}'),
                           ],
                         ),
-                        trailing: post.userId != widget.user.id
+                        trailing: isMyPost
                             ? Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // IconButton(
-                                  //   icon: Icon(Icons.delete),
-                                  //   onPressed: () {
-                                  //     widget.viewModel.deletePost(post);
-                                  //   },
-                                  // ),
                                   IconButton(
-                                    icon: Icon(Icons.report),
+                                    icon: Icon(Icons.delete),
                                     onPressed: () {
-                                      _reportPost(post);
+                                      _deletePost(post);
                                     },
                                   ),
                                 ],
                               )
-                            : null,
+                            : IconButton(
+                                icon: Icon(Icons.report),
+                                onPressed: () {
+                                  _reportPost(post);
+                                },
+                              ),
                         leading:
                             post.imageUrl != null && post.imageUrl.isNotEmpty
                                 ? ClipRRect(

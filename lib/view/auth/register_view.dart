@@ -14,6 +14,7 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String _selectedType = 'user';
+  bool _isRegistered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +69,13 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 child: Text('Register'),
               ),
+              if (_isRegistered)
+                Text(
+                  'Successfully Registered',
+                  style: TextStyle(
+                    color: Colors.green,
+                  ),
+                ),
             ],
           ),
         ),
@@ -83,15 +91,33 @@ class _RegisterViewState extends State<RegisterView> {
       password,
       type: _selectedType,
     );
-//UserModel? user = await _authViewModel.createUserWithEmailAndPassword(email, password, "", "");
+
     if (user != null) {
+      setState(() {
+        _isRegistered = true;
+      });
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoginView()), // 로그인 페이지로 이동
+        MaterialPageRoute(builder: (context) => LoginView()),
       );
-      // 회원가입 성공 처리
     } else {
-      // 회원가입 실패 처리
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Registration Failed'),
+            content: Text('Invalid email or password'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 }

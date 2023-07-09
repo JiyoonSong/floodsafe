@@ -1,5 +1,5 @@
 import 'package:floodsafe/model/user.dart';
-import 'package:floodsafe/view/add_volunteering_view.dart';
+import 'package:floodsafe/view/organizer/add_volunteering_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:floodsafe/viewmodel/volunteer_view_model.dart';
