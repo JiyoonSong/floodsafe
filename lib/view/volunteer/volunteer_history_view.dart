@@ -15,8 +15,7 @@ class VolunteerHistoryPage extends StatelessWidget {
       ),
       body: Consumer<VolunteerViewModel>(
         builder: (context, volunteerViewModel, _) {
-          volunteerViewModel
-              .fetchVolunteers(); // Fetch volunteers to ensure data is up-to-date
+          volunteerViewModel.fetchVolunteers();
           final registeredVolunteers =
               volunteerViewModel.getRegisteredVolunteers();
           return ListView.builder(
@@ -26,9 +25,7 @@ class VolunteerHistoryPage extends StatelessWidget {
               return ListTile(
                 title: Text(volunteer.name),
                 subtitle: Text(volunteer.status),
-                onTap: () {
-                  // Volunteer details page
-                },
+                onTap: () {},
               );
             },
           );

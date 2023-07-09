@@ -38,16 +38,32 @@ class AuthViewModel {
     }
   }
 
-  Future<bool> updateUserProfile(UserModel user) async {
+  Future<bool> updateUserProfile(UserModel updatedUser) async {
     try {
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.id)
-          .update(user.toMap());
+          .doc(updatedUser.id)
+          .update(updatedUser.toMap());
+
       return true;
     } catch (e) {
       print(e.toString());
       return false;
+    }
+  }
+
+  Future<UserModel?> getUserById(String userId) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+          await _firestore.collection('users').doc(userId).get();
+      if (userSnapshot.exists) {
+        UserModel userModel = UserModel.fromMap(userSnapshot.data()!);
+        return userModel;
+      }
+      return null;
+    } catch (e) {
+      print(e.toString());
+      return null;
     }
   }
 

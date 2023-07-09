@@ -6,11 +6,12 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../homepage.dart'; // http 패키지 import
 
 class ProfileView extends StatefulWidget {
-  final UserModel user;
+  late UserModel user;
 
   ProfileView({required this.user});
 
@@ -124,7 +125,7 @@ class _ProfileViewState extends State<ProfileView> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.grey, // 회색 배경색으로 변경
+                    primary: Colors.grey,
                   ),
                   child: Text('Save Profile'),
                 ),
@@ -155,12 +156,18 @@ class _ProfileViewState extends State<ProfileView> {
 
     bool success = await _authViewModel.updateUserProfile(updatedUser);
     if (success) {
-      // 업데이트 성공 처리
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile updated successfully')),
       );
+
+      UserModel? refreshedUser =
+          await _authViewModel.getUserById(widget.user.id);
+      if (refreshedUser != null) {
+        setState(() {
+          widget.user = refreshedUser;
+        });
+      }
     } else {
-      // 업데이트 실패 처리
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update profile')),
       );

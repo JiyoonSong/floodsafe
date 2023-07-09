@@ -197,35 +197,37 @@ class _ChannelViewState extends State<ChannelView> {
                     itemBuilder: (context, index) {
                       final post = activePosts[index];
                       final isMyPost = post.userId == widget.user.id;
-                      return ListTile(
-                        title: Text(post.content),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Place: ${post.place}'),
-                            Text('Username: ${post.name}'),
-                          ],
-                        ),
-                        trailing: isMyPost
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.delete),
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(post.content),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Place: ${post.place}'),
+                                Text('Username: ${post.name}'),
+                              ],
+                            ),
+                            trailing: isMyPost
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.delete),
+                                        onPressed: () {
+                                          _deletePost(post);
+                                        },
+                                      ),
+                                    ],
+                                  )
+                                : IconButton(
+                                    icon: Icon(Icons.report),
                                     onPressed: () {
-                                      _deletePost(post);
+                                      _reportPost(post);
                                     },
                                   ),
-                                ],
-                              )
-                            : IconButton(
-                                icon: Icon(Icons.report),
-                                onPressed: () {
-                                  _reportPost(post);
-                                },
-                              ),
-                        leading:
-                            post.imageUrl != null && post.imageUrl.isNotEmpty
+                            leading: post.imageUrl != null &&
+                                    post.imageUrl.isNotEmpty
                                 ? GestureDetector(
                                     onTap: () {
                                       showDialog(
@@ -252,6 +254,9 @@ class _ChannelViewState extends State<ChannelView> {
                                     ),
                                   )
                                 : SizedBox.shrink(),
+                          ),
+                          SizedBox(height: 16),
+                        ],
                       );
                     },
                   );
