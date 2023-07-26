@@ -1,6 +1,6 @@
-# floodsafe
+# Flood Safe Mobile Application
 
-A new Flutter project.
+Final Year Project (System Development)
 
 ## Getting Started
 
